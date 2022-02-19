@@ -1,5 +1,6 @@
 package com.nestor.superheromvvm.data.repository.character
 
+import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.nestor.superheromvvm.data.model.CharacterDataWrapper
@@ -7,12 +8,16 @@ import com.nestor.superheromvvm.util.nextKey
 import com.nestor.superheromvvm.util.previousKey
 import retrofit2.HttpException
 import retrofit2.Response
+import java.lang.Exception
+import java.net.UnknownHostException
 import javax.inject.Inject
+
+private const val TAG = "CharactersPagingSource"
 
 /**
  * This class will handle the refresh logic.
  */
-class CharactersPagingSource(private val networkCall: suspend (CharacterPaginationKey) -> Response<CharacterDataWrapper>) :
+class CharactersPagingSource(private val repository: CharacterRepository) :
     PagingSource<CharacterPaginationKey, CharacterDataWrapper.CharacterDataContainer.Character>() {
 
     /**
@@ -22,8 +27,8 @@ class CharactersPagingSource(private val networkCall: suspend (CharacterPaginati
      */
     override fun getRefreshKey(state: PagingState<CharacterPaginationKey, CharacterDataWrapper.CharacterDataContainer.Character>): CharacterPaginationKey? {
         return state.anchorPosition?.let { anchorPosition ->
-            state.closestPageToPosition(anchorPosition)?.prevKey?.nextKey()
-                ?: state.closestPageToPosition(anchorPosition)?.nextKey?.previousKey()
+            val anchorPage = state.closestPageToPosition(anchorPosition)
+            anchorPage?.prevKey?.nextKey() ?: anchorPage?.nextKey?.previousKey()
         }
     }
 
@@ -33,17 +38,18 @@ class CharactersPagingSource(private val networkCall: suspend (CharacterPaginati
     override suspend fun load(params: LoadParams<CharacterPaginationKey>): LoadResult<CharacterPaginationKey, CharacterDataWrapper.CharacterDataContainer.Character> {
         val currentKey =
             params.key ?: CharacterPaginationKey(limit = DEFAULT_CHARACTER_LIMIT, offset = 0)
-        val response = networkCall.invoke(currentKey)
-        if (response.isSuccessful) {
+        return try {
+            val response = repository.getCharacters(currentKey)
             val characters = response.body()!!.data.results
             val nextKey = if (characters.isEmpty()) null else currentKey.nextKey()
-            return LoadResult.Page(
+            LoadResult.Page(
                 data = characters,
                 prevKey = currentKey.previousKey(),
-                nextKey = nextKey
+                nextKey = nextKey,
             )
-        } else {
-            return LoadResult.Error(HttpException(response))
+        } catch (e: Exception) {
+            e.printStackTrace()
+            LoadResult.Error(e)
         }
     }
 }

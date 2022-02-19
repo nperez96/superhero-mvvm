@@ -8,6 +8,6 @@
     <fragment
         android:id="@+id/characterListFragment"
         android:name="com.nestor.superheromvvm.ui.character_list.view.CharacterListFragment"
-        android:label="fragment_character_list"
+        android:label="Heroes de Marvel"
         tools:layout="@layout/fragment_character_list" />
 </navigation>

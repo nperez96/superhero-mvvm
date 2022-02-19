@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.LoadState
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -14,11 +15,9 @@ import com.facebook.shimmer.ShimmerDrawable
 import com.nestor.superheromvvm.data.model.CharacterDataWrapper
 import com.nestor.superheromvvm.databinding.CharacterListItemBinding
 
-private const val TAG = "CharacterListAdapter"
-
 class CharacterListAdapter :
     PagingDataAdapter<CharacterDataWrapper.CharacterDataContainer.Character, CharacterListAdapter.ViewHolder>(
-        MyDiffCalback
+        MyDiffCalback()
     ) {
 
     class ViewHolder(
@@ -37,24 +36,18 @@ class CharacterListAdapter :
         fun bind(item: CharacterDataWrapper.CharacterDataContainer.Character?) {
             with(binding) {
                 item?.let {
-                    shimmer.hideShimmer()
                     tvName.text = it.name
                     Glide.with(ivPoster)
                         .load("${it.thumbnail.path}.${it.thumbnail.extension}")
-                        //.load(loadingPlaceholder)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .placeholder(mShimmerDrawable)
                         .into(ivPoster)
-                } ?: {
-                    shimmer.startShimmer()
-                    tvName.text = "Loading"
-                    Glide.with(ivPoster).clear(ivPoster)
                 }
             }
         }
+
     }
 
-    object MyDiffCalback :
+    class MyDiffCalback :
         DiffUtil.ItemCallback<CharacterDataWrapper.CharacterDataContainer.Character>() {
         override fun areItemsTheSame(
             oldItem: CharacterDataWrapper.CharacterDataContainer.Character,
@@ -74,7 +67,6 @@ class CharacterListAdapter :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
-        Log.i(TAG, "onBindViewHolder: is null? ${item == null}")
         holder.bind(item)
     }
 
@@ -87,4 +79,5 @@ class CharacterListAdapter :
             ),
         )
     }
+
 }

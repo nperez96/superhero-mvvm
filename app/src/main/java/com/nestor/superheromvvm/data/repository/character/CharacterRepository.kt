@@ -1,9 +1,8 @@
 package com.nestor.superheromvvm.data.repository.character
 
-import androidx.paging.PagingData
 import com.nestor.superheromvvm.data.model.CharacterDataWrapper
-import kotlinx.coroutines.flow.Flow
+import retrofit2.Response
 
 interface CharacterRepository {
-    fun getCharacters(): Flow<PagingData<CharacterDataWrapper.CharacterDataContainer.Character>>
+    suspend fun getCharacters(key: CharacterPaginationKey): Response<CharacterDataWrapper>
 }
