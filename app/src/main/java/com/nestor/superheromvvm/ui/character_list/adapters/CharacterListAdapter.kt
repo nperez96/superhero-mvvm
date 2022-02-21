@@ -1,42 +1,32 @@
 package com.nestor.superheromvvm.ui.character_list.adapters
 
-import android.graphics.drawable.Drawable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.paging.LoadState
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.facebook.shimmer.Shimmer
 import com.facebook.shimmer.ShimmerDrawable
 import com.nestor.superheromvvm.data.model.CharacterDataWrapper
 import com.nestor.superheromvvm.databinding.CharacterListItemBinding
+import com.nestor.superheromvvm.util.appShimmer
 
-class CharacterListAdapter :
+class CharacterListAdapter(val onClick: (characterId: Int) -> Unit) :
     PagingDataAdapter<CharacterDataWrapper.CharacterDataContainer.Character, CharacterListAdapter.ViewHolder>(
         MyDiffCalback()
     ) {
 
     class ViewHolder(
-        val binding: CharacterListItemBinding
+        val binding: CharacterListItemBinding,
+        val onClick: (characterId: Int) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
-        val mShimmer: Shimmer by lazy {
-            Shimmer.ColorHighlightBuilder()
-                .setDirection(Shimmer.Direction.LEFT_TO_RIGHT)
-                .setAutoStart(true)
-                .build()
-        }
-        val mShimmerDrawable: Drawable by lazy {
-            ShimmerDrawable().apply { setShimmer(mShimmer) }
-        }
+        val mShimmerDrawable = ShimmerDrawable().apply { setShimmer(appShimmer) }
 
         fun bind(item: CharacterDataWrapper.CharacterDataContainer.Character?) {
             with(binding) {
                 item?.let {
                     tvName.text = it.name
+                    binding.root.setOnClickListener { _ -> onClick(it.id) }
                     Glide.with(ivPoster)
                         .load("${it.thumbnail.path}.${it.thumbnail.extension}")
                         .placeholder(mShimmerDrawable)
@@ -77,6 +67,7 @@ class CharacterListAdapter :
                 parent,
                 false
             ),
+            onClick = onClick
         )
     }
 

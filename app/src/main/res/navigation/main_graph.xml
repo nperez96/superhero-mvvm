@@ -9,5 +9,20 @@
         android:id="@+id/characterListFragment"
         android:name="com.nestor.superheromvvm.ui.character_list.view.CharacterListFragment"
         android:label="Heroes de Marvel"
-        tools:layout="@layout/fragment_character_list" />
+        tools:layout="@layout/fragment_character_list">
+        <action
+            android:id="@+id/action_characterListFragment_to_characterDetailsFragment"
+            app:destination="@id/characterDetailsFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/characterDetailsFragment"
+        android:name="com.nestor.superheromvvm.ui.character_details.view.CharacterDetailsFragment"
+        android:label="Detalles"
+        tools:layout="@layout/fragment_character_details">
+        <argument
+            android:name="characterId"
+            app:argType="integer" />
+    </fragment>
 </navigation>

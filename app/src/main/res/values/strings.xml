@@ -2,4 +2,14 @@
     <string name="app_name">SuperHeroMvvm</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="character_name">Detalles %s</string>
+    <string name="no_description">Sin descripción disponible</string>
+    <string name="comics">Comics</string>
+    <string name="stories">Historias</string>
+    <string name="series">Series</string>
+    <string name="events">Eventos</string>
+    <string name="empty_stories">No hay historias para este personaje.</string>
+    <string name="empty_events">No hay eventos para este personaje.</string>
+    <string name="empty_series">No hay series para este personaje.</string>
+    <string name="empty_comics">No hay comics para este personaje.</string>
 </resources>

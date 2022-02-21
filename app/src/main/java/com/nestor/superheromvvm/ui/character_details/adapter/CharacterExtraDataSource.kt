@@ -1,31 +1,27 @@
-package com.nestor.superheromvvm.data.repository.character
+package com.nestor.superheromvvm.ui.character_details.adapter
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.nestor.superheromvvm.data.model.CharacterDataWrapper
+import com.nestor.superheromvvm.data.model.CharacterExtraData
+import com.nestor.superheromvvm.data.repository.character.DEFAULT_CHARACTER_EXTRA_DATA_LIMIT
+import com.nestor.superheromvvm.data.repository.character.DEFAULT_CHARACTER_LIMIT
+import com.nestor.superheromvvm.data.repository.character.PaginationKey
 import com.nestor.superheromvvm.util.nextKey
 import com.nestor.superheromvvm.util.previousKey
-import retrofit2.HttpException
 import retrofit2.Response
-import java.lang.Exception
-import java.net.UnknownHostException
-import javax.inject.Inject
-
-private const val TAG = "CharactersPagingSource"
 
 /**
  * This class will handle the refresh logic.
  */
-class CharactersPagingSource(private val repository: CharacterRepository) :
-    PagingSource<CharacterPaginationKey, CharacterDataWrapper.CharacterDataContainer.Character>() {
+class CharacterExtraDataSource(private val loadData: suspend (key: PaginationKey) -> Response<List<CharacterExtraData>>) :
+    PagingSource<PaginationKey, CharacterExtraData>() {
 
     /**
      * Get the key to refresh the current state, if the item is at the bottom it will get the prev key,
      * if the item is at the top will get the next key and if the item is the first item will return null
      * cause theres no previous key
      */
-    override fun getRefreshKey(state: PagingState<CharacterPaginationKey, CharacterDataWrapper.CharacterDataContainer.Character>): CharacterPaginationKey? {
+    override fun getRefreshKey(state: PagingState<PaginationKey, CharacterExtraData>): PaginationKey? {
         return state.anchorPosition?.let { anchorPosition ->
             val anchorPage = state.closestPageToPosition(anchorPosition)
             anchorPage?.prevKey?.nextKey() ?: anchorPage?.nextKey?.previousKey()
@@ -35,15 +31,15 @@ class CharactersPagingSource(private val repository: CharacterRepository) :
     /**
      * Will load the next page extracting the chars from the response, and send the key for the next/previous request
      */
-    override suspend fun load(params: LoadParams<CharacterPaginationKey>): LoadResult<CharacterPaginationKey, CharacterDataWrapper.CharacterDataContainer.Character> {
+    override suspend fun load(params: LoadParams<PaginationKey>): LoadResult<PaginationKey, CharacterExtraData> {
         val currentKey =
-            params.key ?: CharacterPaginationKey(limit = DEFAULT_CHARACTER_LIMIT, offset = 0)
+            params.key ?: PaginationKey(limit = DEFAULT_CHARACTER_EXTRA_DATA_LIMIT, offset = 0)
         return try {
-            val response = repository.getCharacters(currentKey)
-            val characters = response.body()!!.data.results
-            val nextKey = if (characters.isEmpty()) null else currentKey.nextKey()
+            val response = loadData.invoke(currentKey)
+            val data = response.body()!!
+            val nextKey = if (data.isEmpty()) null else currentKey.nextKey()
             LoadResult.Page(
-                data = characters,
+                data = data,
                 prevKey = currentKey.previousKey(),
                 nextKey = nextKey,
             )

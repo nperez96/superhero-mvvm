@@ -8,6 +8,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import com.nestor.superheromvvm.databinding.FragmentCharacterListBinding
 import com.nestor.superheromvvm.ui.character_list.adapters.CharacterListAdapter
@@ -25,7 +26,7 @@ class CharacterListFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mCharacterAdapter = CharacterListAdapter().apply {
+        mCharacterAdapter = CharacterListAdapter(onClick = { navToCharacterDetails(it) }).apply {
             addLoadStateListener {
                 mBinding.layoutRetry.isVisible = it.refresh is LoadState.Error
                 mBinding.progressCircular.isVisible = it.refresh is LoadState.Loading
@@ -54,5 +55,12 @@ class CharacterListFragment : Fragment() {
                 mCharacterAdapter.submitData(it)
             }
         }
+    }
+
+    private fun navToCharacterDetails(characterId: Int) {
+        val action =
+            CharacterListFragmentDirections
+                .actionCharacterListFragmentToCharacterDetailsFragment(characterId)
+        findNavController().navigate(action)
     }
 }
