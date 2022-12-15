@@ -26,7 +26,6 @@ class MyGlideModule constructor() :
     AppGlideModule() {
     override fun registerComponents(context: Context, glide: Glide, registry: Registry) {
         super.registerComponents(context, glide, registry)
-        //  todo: change this to use hilt injection
         val client: OkHttpClient = OkHttpClient.Builder()
             .addInterceptor(AuthorizationInterceptor(DateRepositoryImpl()))
             .addInterceptor(SecureSchemaInterceptor())
