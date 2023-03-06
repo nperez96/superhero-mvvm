@@ -1,10 +1,7 @@
 package com.nestor.superheromvvm.data.repository.character
 
 import com.nestor.superheromvvm.data.remote.CharacterService
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
-import io.mockk.mockk
+import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 
@@ -18,9 +15,18 @@ internal class CharacterRepositoryImplTest {
      */
     @Test
     fun `getCharacterSeries should call service_getCharacterSeries`() = runBlocking {
-        //  TODO: Complete this test
-        coEvery { characterService.getCharacterSeries(any(), any(), any()) }.returns(mockk())
-        coVerify { }
+        coEvery { characterService.getCharacterSeries(any(), any(), any()) }.returns(mockk {})
+        sut.getCharacterSeries(
+            characterId = 123,
+            key = PaginationKey(limit = 12, offset = 23)
+        )
+        coVerify(exactly = 1) {
+            characterService.getCharacterSeries(
+                characterId = 123,
+                limit = 12,
+                offset = 23
+            )
+        }
     }
 
 
